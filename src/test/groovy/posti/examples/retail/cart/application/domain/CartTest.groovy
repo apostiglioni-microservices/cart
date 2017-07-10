@@ -1,7 +1,7 @@
-package posti.examples.retail.cart
+package posti.examples.retail.cart.application.domain
 
 import spock.lang.Specification
-import posti.examples.retail.cart.Cart.CartBuilder
+import posti.examples.retail.cart.application.domain.Cart.CartBuilder
 
 
 class CartTest extends Specification {

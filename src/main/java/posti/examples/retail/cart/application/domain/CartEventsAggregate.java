@@ -1,15 +1,15 @@
-package posti.examples.retail.cart;
+package posti.examples.retail.cart.application.domain;
 
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 
 import io.vavr.collection.Stream;
-import posti.examples.retail.cart.Cart.CartBuilder;
+import posti.examples.retail.cart.application.domain.Cart.CartBuilder;
 
 import static java.lang.String.format;
 
-public class CartAggregate {
+public class CartEventsAggregate {
     @SuppressWarnings("unchecked")
     public Cart aggregate(Cart initialState, List<Event> events) {
         BiFunction<Cart, Event, Cart> handleEvents = (snapshot, event) -> {

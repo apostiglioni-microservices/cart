@@ -1,9 +1,7 @@
-package posti.examples.retail.cart;
+package posti.examples.retail.cart.application.domain;
 
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

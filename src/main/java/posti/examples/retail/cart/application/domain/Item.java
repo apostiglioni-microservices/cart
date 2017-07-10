@@ -1,4 +1,4 @@
-package posti.examples.retail.cart;
+package posti.examples.retail.cart.application.domain;
 
 import java.util.function.Consumer;
 

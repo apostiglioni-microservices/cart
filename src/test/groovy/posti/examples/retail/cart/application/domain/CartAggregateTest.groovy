@@ -1,14 +1,14 @@
-package posti.examples.retail.cart
+package posti.examples.retail.cart.application.domain
 
-import posti.examples.retail.cart.Cart.CartBuilder
+import posti.examples.retail.cart.application.domain.Cart.CartBuilder
 import spock.lang.Specification
 
 import static java.util.UUID.randomUUID
-import static posti.examples.retail.cart.Event.EventType.ADD_ITEM
-import static posti.examples.retail.cart.Event.EventType.REMOVE_ITEM
+import static posti.examples.retail.cart.application.domain.Event.EventType.ADD_ITEM
+import static posti.examples.retail.cart.application.domain.Event.EventType.REMOVE_ITEM
 
 class CartAggregateTest extends Specification {
-    CartAggregate cartAggregate = new CartAggregate()
+    CartEventsAggregate cartAggregate = new CartEventsAggregate()
 
     def "should add single item"() {
         setup:
