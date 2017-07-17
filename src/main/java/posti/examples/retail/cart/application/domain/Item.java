@@ -8,7 +8,7 @@ import lombok.Value;
 @Value
 @Builder(toBuilder = true)
 public class Item {
-    String sku; // TODO change to product
+    String sku;
     int quantity;
 
     public static Item build(Consumer<ItemBuilder> consumer) {

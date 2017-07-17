@@ -1,6 +1,7 @@
 package posti.examples.retail.cart.application.domain;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import lombok.AllArgsConstructor;
@@ -17,13 +18,17 @@ import static lombok.AccessLevel.PRIVATE;
 @AllArgsConstructor(access = PRIVATE)
 public class Cart {
     @NonNull
+
+    private UUID id;
+
+    @NonNull
     private Long version;
 
     @NonNull @Singular
     private Set<Item> items;
 
-    public static Cart empty() {
-        return new Cart(0l, emptySet());
+    public static Cart empty(UUID id) {
+        return new Cart(id, 0L, emptySet());
     }
 
     public static class CartBuilder {

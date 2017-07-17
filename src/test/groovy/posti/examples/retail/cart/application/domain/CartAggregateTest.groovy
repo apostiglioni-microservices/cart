@@ -4,77 +4,64 @@ import posti.examples.retail.cart.application.domain.Cart.CartBuilder
 import spock.lang.Specification
 
 import static java.util.UUID.randomUUID
-import static posti.examples.retail.cart.application.domain.Event.EventType.ADD_ITEM
-import static posti.examples.retail.cart.application.domain.Event.EventType.REMOVE_ITEM
+import static posti.examples.retail.cart.application.domain.Event.EventType.CLEARED
+import static posti.examples.retail.cart.application.domain.Event.EventType.QUANTITY_CHANGED
 
 class CartAggregateTest extends Specification {
     CartEventsAggregate cartAggregate = new CartEventsAggregate()
 
-    def "should add single item"() {
+    def "should change quantity"() {
         setup:
-            def userId = randomUUID()
-            def initialState = Cart.empty()
-            def events = [
-               new Event(1l, ADD_ITEM, userId, new StockChange("sku-1", 1))
-            ,  new Event(2l, ADD_ITEM, userId, new StockChange("sku-1", 2))
-            ,  new Event(3l, ADD_ITEM, userId, new StockChange("sku-1", 3))
-            ,  new Event(4l, ADD_ITEM, userId, new StockChange("sku-1", 4))
-            ]
+            def cartId = randomUUID()
+            def initialState = Cart.empty(cartId)
+            def version = initialState.version + 1
+            def event = new Event(QUANTITY_CHANGED, cartId, version, new QuantityChange("sku-1", 4))
 
         expect:
-            cartAggregate.aggregate(initialState, events) == CartBuilder.buildWith({ it
-                                                                .version(4l)
-                                                                .item(new Item("sku-1", 10))
+            cartAggregate.aggregate(initialState, event)  == CartBuilder.buildWith({ it
+                                                                .id(event.cartId)
+                                                                .version(event.cartVersion)
+                                                                .item(new Item("sku-1", 4))
                                                              })
     }
 
     def "should reject out of order events"() {
         setup:
-            def userId = randomUUID()
-            def initialState = CartBuilder.buildWith { it.version(2l)}
-            def events = [new Event(4l, ADD_ITEM, userId, new StockChange("sku-1", 2))]
+            def cartId = randomUUID()
+            def version = 1
+            def initialState = CartBuilder.buildWith { it.id(cartId).version(2l)}
+            def event = new Event(QUANTITY_CHANGED, cartId, version, new QuantityChange("sku-1", 2))
         when:
-            cartAggregate.aggregate(initialState, events)
+            cartAggregate.aggregate(initialState, event)
         then:
             thrown OutOfOrderException
     }
 
-    def "should be empty when removing more than added"() {
+    def "should be empty when removing value is 0"() {
         setup:
-            def userId = randomUUID()
-            def initialState = Cart.empty()
-            def events = [
-              new Event(1l, ADD_ITEM   , userId, new StockChange("sku-1", 1))
-            , new Event(2l, REMOVE_ITEM, userId, new StockChange("sku-1", -2))
-            ]
+            def cartId = randomUUID()
+            def initialState = Cart.empty(cartId)
+            def event = new Event(QUANTITY_CHANGED, cartId, 1, new QuantityChange("sku-1", 0))
 
         expect:
-            cartAggregate.aggregate(initialState, events) == CartBuilder.buildWith { it
-                                                                .version(2l)
+            cartAggregate.aggregate(initialState, event) == CartBuilder.buildWith { it
+                                                                .id(event.cartId)
+                                                                .version(event.cartVersion)
                                                                 .items([])
-                                                             }
+                                                            }
     }
 
-    def "should add and remove multiple items"() {
+    def "should clear cart"() {
         setup:
-            def userId = randomUUID()
-            def initialState = Cart.empty();
-            def events = [
-               new Event(1l, ADD_ITEM   , userId, new StockChange("sku-1", 1))
-            ,  new Event(2l, ADD_ITEM   , userId, new StockChange("sku-2", 2))
-            ,  new Event(3l, ADD_ITEM   , userId, new StockChange("sku-1", 3))
-            ,  new Event(4l, ADD_ITEM   , userId, new StockChange("sku-3", 4))
-            ,  new Event(5l, REMOVE_ITEM, userId, new StockChange("sku-2", -1))
-            ,  new Event(6l, REMOVE_ITEM, userId, new StockChange("sku-1", -1))
-            ,  new Event(7l, ADD_ITEM   , userId, new StockChange("sku-2", 4))
-            ]
+            def cartId = randomUUID()
+            def initialState = CartBuilder.buildWith { it.id(cartId).version(1L).item(new Item("sku-1", 3)) }
+            def event = Event.builder().cartId(cartId).cartVersion(initialState.version + 1).type(CLEARED).build()
 
         expect:
-            cartAggregate.aggregate(initialState, events) == CartBuilder.buildWith { it
-                                                                .version(7l)
-                                                                .item(new Item("sku-1", 3))
-                                                                .item(new Item("sku-2", 5))
-                                                                .item(new Item("sku-3", 4))
-                                                             }
+            cartAggregate.aggregate(initialState, event) == CartBuilder.buildWith { it
+                                                                .id(event.cartId)
+                                                                .version(event.cartVersion)
+                                                                .items([])
+                                                            }
     }
 }

@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public class StockChange {
+public class QuantityChange {
     @NonNull String sku;
     int quantity;
 }

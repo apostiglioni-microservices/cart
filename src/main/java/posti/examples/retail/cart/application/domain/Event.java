@@ -2,26 +2,28 @@ package posti.examples.retail.cart.application.domain;
 
 import java.util.UUID;
 
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
-import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Value
+@Builder
+@Document
 public class Event<D> {
-    enum EventType {
-        ADD_ITEM,
+    public enum EventType {
+        QUANTITY_CHANGED,
         REMOVE_ITEM,
-        CLEAR
+        CLEARED
     }
-
-    @Id @NonNull
-    Long id;
 
     @NonNull
     EventType type;
 
     @NonNull
-    UUID userId;
+    UUID cartId;
+
+    @NonNull Long cartVersion;
 
     D data;
 }
