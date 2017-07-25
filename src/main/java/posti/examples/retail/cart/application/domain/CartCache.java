@@ -10,11 +10,11 @@ import lombok.NonNull;
 public class CartCache {
     private final Map<UUID, Cart> cache = new HashMap<>();
 
-    public Optional<Cart> get(@NonNull UUID key) {
+    Optional<Cart> get(@NonNull UUID key) {
         return Optional.ofNullable(cache.get(key));
     }
 
-    public void put(@NonNull UUID key, @NonNull Cart cart) {
+    void put(@NonNull UUID key, @NonNull Cart cart) {
         Cart current = cache.get(key);
         if (current == null || cart.getVersion() > current.getVersion()) {
             synchronized (cache) {

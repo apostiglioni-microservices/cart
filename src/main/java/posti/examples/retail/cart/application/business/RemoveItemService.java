@@ -1,4 +1,4 @@
-package posti.examples.retail.cart.application.api;
+package posti.examples.retail.cart.application.business;
 
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
@@ -17,7 +17,7 @@ public class RemoveItemService {
     private final EventRepository eventRepository;
     private final EventFactory eventFactory;
 
-    public Cart execute(ValidatingSupplier<Request> supplier) {
+    public Cart accept(ValidatingSupplier<Request> supplier) {
         Request request = supplier.getValidOrFail();
 
         Event<QuantityChange> event = eventFactory.changeProductQuantity(request.getSku(), 0, request.getCartId());

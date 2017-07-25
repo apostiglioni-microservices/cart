@@ -3,37 +3,16 @@ package posti.examples.retail.cart.ports.rest.resources;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.springframework.http.ResponseEntity;
-import posti.examples.retail.cart.adapters.CartBuilder;
-import posti.examples.retail.cart.adapters.ItemBuilder;
-import posti.examples.retail.cart.adapters.ItemBuilderSpec;
+import posti.examples.retail.cart.adapters.business.CartState;
+import posti.examples.retail.cart.adapters.business.ItemState;
+import posti.examples.retail.cart.adapters.business.StateTransfer;
 
-public class CartResourceResponseBuilder implements CartBuilder {
+public class CartResourceResponseBuilder implements CartState {
     private Long version;
     private UUID id;
     private List<ItemResource> items = new LinkedList<>();
-
-    @Override
-    public CartBuilder withId(UUID id) {
-        this.id = id;
-        return this;
-    }
-
-    @Override
-    public CartBuilder withVersion(Long version) {
-        this.version = version;
-        return this;
-    }
-
-    @Override
-    public CartBuilder withItem(ItemBuilderSpec spec) {
-        ItemResourceBuilder builder = new ItemResourceBuilder();
-        spec.accept(builder);
-        items.add(builder.build());
-        return this;
-    }
 
     public ResponseEntity<CartResource> build() {
         CartResource resource = new CartResource(id, version, items);
@@ -44,18 +23,38 @@ public class CartResourceResponseBuilder implements CartBuilder {
         return this;
     }
 
-    private class ItemResourceBuilder implements ItemBuilder {
+    @Override
+    public CartResourceResponseBuilder withId(UUID id) {
+        this.id = id;
+        return this;
+    }
+
+    @Override
+    public CartResourceResponseBuilder withVersion(Long version) {
+        this.version = version;
+        return this;
+    }
+
+    @Override
+    public CartResourceResponseBuilder withItem(StateTransfer<ItemState> spec) {
+        ItemResourceBuilder builder = new ItemResourceBuilder();
+        spec.transferTo(builder);
+        items.add(builder.build());
+        return this;
+    }
+
+    private class ItemResourceBuilder implements ItemState {
         private String sku;
         private int quantity;
 
         @Override
-        public ItemBuilder withSku(String sku) {
+        public ItemResourceBuilder withSku(String sku) {
             this.sku = sku;
             return this;
         }
 
         @Override
-        public ItemBuilder withQuantity(int quantity) {
+        public ItemResourceBuilder withQuantity(int quantity) {
             this.quantity = quantity;
             return this;
         }
@@ -63,5 +62,12 @@ public class CartResourceResponseBuilder implements CartBuilder {
         public ItemResource build() {
             return new ItemResource(sku, quantity);
         }
+    }
+
+    public static ResponseEntity<CartResource> asOkResponse(StateTransfer<CartState> stateTransfer) {
+        CartResourceResponseBuilder builder = new CartResourceResponseBuilder();
+        builder.status(200);
+        stateTransfer.transferTo(builder);
+        return builder.build();
     }
 }

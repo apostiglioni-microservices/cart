@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import posti.examples.retail.cart.adapters.ClearCartSerivceAdapter;
-import posti.examples.retail.cart.adapters.GetCartServiceAdapter;
+import posti.examples.retail.cart.adapters.business.ClearCartUseCaseExecutor;
+import posti.examples.retail.cart.adapters.business.GetCartUseCaseExecutor;
 
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -17,24 +17,20 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping("/carts")
 @RequiredArgsConstructor
 public class CartsEndpoints {
-    private final GetCartServiceAdapter getCartServiceAdapter;
-    private final ClearCartSerivceAdapter clearCartServiceAdapter;
+    private final GetCartUseCaseExecutor getCartUseCase;
+    private final ClearCartUseCaseExecutor clearCartUseCase;
 
     @RequestMapping(path = "/{cartId}", method = GET)
     public ResponseEntity<CartResource> getCart(@PathVariable("cartId") UUID cartId) {
-        CartResourceResponseBuilder resourceBuilder = new CartResourceResponseBuilder();
-        return getCartServiceAdapter.execute(builder -> builder.withCartId(cartId))
-                  .accept(resourceBuilder)
-                  .status(201)
-                  .build();
+        return getCartUseCase
+                .apply(scenario -> scenario.withCartId(cartId))
+                .map(CartResourceResponseBuilder::asOkResponse);
     }
 
     @RequestMapping(path = "/{cartId}", method = DELETE)
     public ResponseEntity<CartResource> clearCart(@PathVariable("cartId") UUID cartId) {
-        CartResourceResponseBuilder resourceBuilder = new CartResourceResponseBuilder();
-        return clearCartServiceAdapter.execute(builder -> builder.withCartId(cartId))
-                .accept(resourceBuilder)
-                .status(201)
-                .build();
+        return clearCartUseCase
+                .apply(scenario -> scenario.withCartId(cartId))
+                .map(CartResourceResponseBuilder::asOkResponse);
     }
 }

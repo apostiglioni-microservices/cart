@@ -4,11 +4,10 @@ import java.util.UUID;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import posti.examples.retail.store.sequence.SequenceProvider;
 
 import static java.lang.String.format;
+import static posti.examples.retail.cart.application.domain.Event.EventType.CART_CLEARED;
 import static posti.examples.retail.cart.application.domain.Event.EventType.QUANTITY_CHANGED;
-import static posti.examples.retail.cart.application.domain.Event.EventType.CLEARED;
 
 @RequiredArgsConstructor
 public class EventFactory {
@@ -22,7 +21,7 @@ public class EventFactory {
 
     public Event<Void> clear(UUID cartId) {
         long cartVersion = nextVersion(cartId);
-        return new Event<>(CLEARED, cartId, cartVersion, null);
+        return new Event<>(CART_CLEARED, cartId, cartVersion, null);
     }
 
     private long nextVersion(UUID cartId) {

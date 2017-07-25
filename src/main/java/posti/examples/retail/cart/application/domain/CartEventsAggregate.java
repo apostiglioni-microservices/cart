@@ -6,18 +6,21 @@ import io.vavr.collection.Stream;
 import posti.examples.retail.cart.application.domain.Cart.CartBuilder;
 
 import static java.lang.String.format;
-
 import static java.util.Collections.emptySet;
 
 public class CartEventsAggregate {
-    public Cart aggregate(Cart snapshot, Event event) {
+    Cart aggregate(Cart snapshot, Event event) {
         if (event.getCartVersion() != snapshot.getVersion() + 1) {
-            throw new OutOfOrderException(format("Can't apply event %s to cart %s", event, snapshot));
+            throw new OutOfOrderException(format("Can't accept event %s to cart %s", event, snapshot));
         }
 
+        return handle(snapshot, event);
+    }
+
+    private Cart handle(Cart snapshot, Event event) {
         switch (event.getType()) {
-            case CLEARED: return handleClear(event);
-            case REMOVE_ITEM     :
+            case ITEM_REMOVED    :
+            case CART_CLEARED    : return handleClear(event);
             case QUANTITY_CHANGED: return handleQuantityChange(snapshot, event);
             default              : throw new RuntimeException(format("Unknown event %s", event));
         }

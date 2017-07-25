@@ -5,11 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 
 @Value
-public class SaveItemRequestBuilderVisitor {
+public class SaveItemRequestBody {
     private int quantity;
 
     @JsonCreator
-    public SaveItemRequestBuilderVisitor(@JsonProperty("quantity") int quantity) {
+    public SaveItemRequestBody(@JsonProperty("quantity") int quantity) {
         this.quantity = quantity;
     }
 }

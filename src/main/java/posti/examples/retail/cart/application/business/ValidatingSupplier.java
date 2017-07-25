@@ -1,4 +1,4 @@
-package posti.examples.retail.cart.application.api;
+package posti.examples.retail.cart.application.business;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -12,7 +12,7 @@ public class ValidatingSupplier<T> {
     private final Validator validator;
     private final T value;
 
-    public T getValidOrFail() {
+    T getValidOrFail() {
         Set<ConstraintViolation<T>> violations = validator.validate(value);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);

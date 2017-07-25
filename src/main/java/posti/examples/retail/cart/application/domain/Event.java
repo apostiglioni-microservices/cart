@@ -13,8 +13,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Event<D> {
     public enum EventType {
         QUANTITY_CHANGED,
-        REMOVE_ITEM,
-        CLEARED
+        ITEM_REMOVED,
+        CART_CLEARED
     }
 
     @NonNull
